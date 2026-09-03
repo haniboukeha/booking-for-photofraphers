@@ -66,6 +66,12 @@ export function BookingFlow({
   const [state, formAction] = useActionState<BookingFormState, FormData>(submitBooking, { ok: false });
   const checkId = useRef(0);
 
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
   const minDate = useMemo(() => {
     const dt = new Date(today + "T12:00:00Z");
     dt.setUTCDate(dt.getUTCDate() + 1);
@@ -107,6 +113,16 @@ export function BookingFlow({
 
   const total = cartTotal(items);
   const canSubmit = items.length > 0 && date !== "" && effectiveTime !== "" && availability?.available === true && !checking;
+
+  if (!mounted) {
+    return (
+      <div className="card mx-auto max-w-md animate-pulse p-12 text-center">
+        <div className="mx-auto h-16 w-16 rounded-2xl bg-slate-100" />
+        <div className="mx-auto mt-5 h-5 w-40 rounded-full bg-slate-100" />
+        <div className="mx-auto mt-3 h-4 w-56 rounded-full bg-slate-100" />
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (

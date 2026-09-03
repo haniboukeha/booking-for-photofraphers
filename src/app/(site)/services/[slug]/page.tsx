@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { getLocale } from "@/lib/locale";
 import { getDict } from "@/lib/i18n";
+import { tc } from "@/lib/content-i18n";
 import { PackagePicker } from "@/components/PackagePicker";
 
 export default async function ServicePage({ params }: PageProps<"/services/[slug]">) {
@@ -29,16 +30,16 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
 
   const pickerData = service.packages.map((p) => ({
     id: p.id,
-    name: p.name,
-    description: p.description,
+    name: tc(locale, p.name),
+    description: tc(locale, p.description),
     image: p.imageUrl,
     price: p.price,
-    features: p.features,
+    features: p.features.map((f) => tc(locale, f)),
     addons: p.addons
       .filter((l) => l.addon.active && !l.addon.archivedAt)
       .map((l) => ({
         id: l.addon.id,
-        name: l.addon.name,
+        name: tc(locale, l.addon.name),
         image: l.addon.imageUrl,
         price: l.addon.price,
         allowQuantity: l.addon.allowQuantity,
@@ -59,13 +60,13 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={service.coverImageUrl ?? "/gallery/g1.jpg"} alt={service.name} className="w-full object-cover" />
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 to-transparent p-6 text-white">
-              <h1 className="text-2xl font-extrabold tracking-tight">{service.name}</h1>
+              <h1 className="text-2xl font-extrabold tracking-tight">{tc(locale, service.name)}</h1>
               <p className="mt-1 flex items-center gap-2 text-sm text-slate-300">
                 <Clock className="h-4 w-4 text-sky-400" /> {d.serviceDetail.duration}: {Math.round(service.durationMinutes / 60)}h
               </p>
             </div>
           </div>
-          <p className="card mt-5 p-5 text-sm leading-relaxed text-slate-600">{service.description}</p>
+          <p className="card mt-5 p-5 text-sm leading-relaxed text-slate-600">{tc(locale, service.description)}</p>
         </div>
 
         <div className="lg:col-span-3">

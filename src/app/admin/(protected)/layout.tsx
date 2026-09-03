@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Camera } from "lucide-react";
+import { Camera, ExternalLink } from "lucide-react";
 import { requireAdminPage } from "@/lib/auth/session";
 import { AdminNav, AdminLogout } from "@/components/AdminNav";
 
@@ -27,6 +27,20 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </div>
       </aside>
       <div className="flex-1">
+        <div className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-2.5 md:hidden">
+          <Link href="/admin" className="flex items-center gap-2 text-sm font-bold">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-sky-500 via-cyan-500 to-emerald-500 text-white">
+              <Camera className="h-3.5 w-3.5" />
+            </span>
+            Admin
+          </Link>
+          <div className="flex items-center gap-1">
+            <Link href="/" className="btn btn-ghost btn-sm">
+              <ExternalLink className="h-3.5 w-3.5" /> Store
+            </Link>
+            <AdminLogout />
+          </div>
+        </div>
         <div className="md:hidden">
           <AdminNav />
         </div>

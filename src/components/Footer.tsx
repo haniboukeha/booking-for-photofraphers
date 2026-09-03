@@ -3,6 +3,7 @@ import { AtSign, Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react"
 import { getSettings } from "@/lib/settings";
 import { getLocale } from "@/lib/locale";
 import { getDict } from "@/lib/i18n";
+import { tc } from "@/lib/content-i18n";
 
 export async function Footer() {
   const [s, locale] = await Promise.all([getSettings(), getLocale()]);
@@ -12,7 +13,7 @@ export async function Footer() {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div className="sm:col-span-2 lg:col-span-1">
           <p className="text-lg font-bold text-white">{s.businessName}</p>
-          <p className="mt-3 text-sm leading-relaxed text-slate-400">{s.description}</p>
+          <p className="mt-3 text-sm leading-relaxed text-slate-400">{tc(locale, s.description)}</p>
           <Link
             href="/booking"
             className="btn btn-amber mt-5"

@@ -70,7 +70,7 @@ async function main() {
       basePrice: 30000,
       durationMinutes: 480,
       featured: true,
-      coverImageUrl: "/gallery/g1.svg",
+      coverImageUrl: "/gallery/s-wedding.jpg",
       packages: [
         { name: "Basic", price: 30000, description: "Half-day coverage", features: ["4 hours coverage", "1 photographer", "100 edited photos"], addons: ["extraHour", "extraPhotos"] },
         { name: "Standard", price: 55000, description: "Full-day coverage", features: ["6 hours coverage", "1 photographer", "200 edited photos"], addons: ["extraHour", "secondPhotographer", "extraPhotos"] },
@@ -84,7 +84,7 @@ async function main() {
       basePrice: 8000,
       durationMinutes: 120,
       featured: true,
-      coverImageUrl: "/gallery/g2.svg",
+      coverImageUrl: "/gallery/s-portrait.jpg",
       packages: [
         { name: "Essential", price: 8000, description: "1 hour, 1 location", features: ["1 hour session", "30 edited photos"], addons: ["extraHour", "extraPhotos"] },
         { name: "Deluxe", price: 15000, description: "2 hours, 2 locations", features: ["2 hour session", "80 edited photos", "Outfit changes"], addons: ["extraHour", "secondLocation", "extraPhotos"] },
@@ -97,7 +97,7 @@ async function main() {
       basePrice: 20000,
       durationMinutes: 240,
       featured: true,
-      coverImageUrl: "/gallery/g3.svg",
+      coverImageUrl: "/gallery/s-product.jpg",
       packages: [
         { name: "Half Day", price: 20000, description: "Up to 15 products", features: ["4 hour studio session", "Up to 15 products", "White background"], addons: ["retouching"] },
         { name: "Full Day", price: 38000, description: "Up to 40 products", features: ["8 hour studio session", "Up to 40 products", "Lifestyle setups"], addons: ["retouching", "extraHour"] },
@@ -110,7 +110,7 @@ async function main() {
       basePrice: 25000,
       durationMinutes: 240,
       featured: false,
-      coverImageUrl: "/gallery/g4.svg",
+      coverImageUrl: "/gallery/s-event.jpg",
       packages: [
         { name: "Standard", price: 25000, description: "4 hours", features: ["4 hours coverage", "150 edited photos", "Same-week delivery"], addons: ["extraHour", "secondPhotographer", "highlight"] },
       ],
@@ -151,15 +151,18 @@ async function main() {
 
   const imageCount = await prisma.galleryImage.count();
   if (imageCount === 0) {
-    const wedding = await prisma.service.findUnique({ where: { slug: "wedding-photography" } });
+    const bySlug = await prisma.service.findMany({ where: { slug: { in: ["wedding-photography", "portrait-session", "product-photography", "event-coverage"] } } });
+    const sid = Object.fromEntries(bySlug.map((s) => [s.slug, s.id]));
     await prisma.galleryImage.createMany({
       data: [
-        { imageUrl: "/gallery/g1.svg", altText: "Wedding", serviceId: wedding?.id, sortOrder: 0 },
-        { imageUrl: "/gallery/g2.svg", altText: "Portrait", sortOrder: 1 },
-        { imageUrl: "/gallery/g3.svg", altText: "Product", sortOrder: 2 },
-        { imageUrl: "/gallery/g4.svg", altText: "Event", sortOrder: 3 },
-        { imageUrl: "/gallery/g5.svg", altText: "Golden hour", sortOrder: 4 },
-        { imageUrl: "/gallery/g6.svg", altText: "Studio", sortOrder: 5 },
+        { imageUrl: "/gallery/g1.jpg", altText: "Wedding ceremony", serviceId: sid["wedding-photography"], sortOrder: 0 },
+        { imageUrl: "/gallery/g2.jpg", altText: "Couple portrait", serviceId: sid["wedding-photography"], sortOrder: 1 },
+        { imageUrl: "/gallery/g3.jpg", altText: "Studio portrait", serviceId: sid["portrait-session"], sortOrder: 2 },
+        { imageUrl: "/gallery/g4.jpg", altText: "Golden hour", serviceId: sid["portrait-session"], sortOrder: 3 },
+        { imageUrl: "/gallery/g5.jpg", altText: "Product still life", serviceId: sid["product-photography"], sortOrder: 4 },
+        { imageUrl: "/gallery/g6.jpg", altText: "E-commerce shot", serviceId: sid["product-photography"], sortOrder: 5 },
+        { imageUrl: "/gallery/g7.jpg", altText: "Live event", serviceId: sid["event-coverage"], sortOrder: 6 },
+        { imageUrl: "/gallery/g8.jpg", altText: "Conference coverage", serviceId: sid["event-coverage"], sortOrder: 7 },
       ],
     });
   }

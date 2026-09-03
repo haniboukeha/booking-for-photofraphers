@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { getLocale } from "@/lib/locale";
 import { getDict, fmt } from "@/lib/i18n";
+import { tc } from "@/lib/content-i18n";
 import { formatMoney } from "@/lib/money";
 
 export default async function HomePage() {
@@ -35,12 +36,12 @@ export default async function HomePage() {
               <Sparkles className="h-3.5 w-3.5" /> {settings.businessName}
             </p>
             <h1 className="fade-up d1 mt-5 text-4xl font-extrabold leading-[1.08] tracking-tight md:text-6xl">
-              {settings.headline || fmt(d.home.ctaTitle, {})}
+              {tc(locale, settings.headline) || fmt(d.home.ctaTitle, {})}
             </h1>
             <p className="fade-up d2 mt-3 text-2xl font-bold md:text-3xl">
               <span className="text-gradient">{d.home.howTitle}</span>
             </p>
-            <p className="fade-up d2 mt-5 max-w-lg text-lg leading-relaxed text-slate-300">{settings.description}</p>
+            <p className="fade-up d2 mt-5 max-w-lg text-lg leading-relaxed text-slate-300">{tc(locale, settings.description)}</p>
             <div className="fade-up d3 mt-9 flex flex-wrap gap-4">
               <Link href="/services" className="btn btn-amber px-7 py-3 text-base">
                 {d.home.ctaServices} <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
@@ -103,7 +104,7 @@ export default async function HomePage() {
                 <span className="chip bg-white/15 text-sky-300 ring-1 ring-white/25 backdrop-blur">
                   {s._count.packages} {d.common.packages}
                 </span>
-                <h3 className="mt-2 text-lg font-bold">{s.name}</h3>
+                <h3 className="mt-2 text-lg font-bold">{tc(locale, s.name)}</h3>
                 <p className="mt-1 text-sm text-slate-300">
                   {d.common.from} <span className="font-bold text-white">{formatMoney(s.basePrice, settings.currency)}</span>
                 </p>

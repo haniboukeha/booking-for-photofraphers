@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { getLocale } from "@/lib/locale";
 import { getDict } from "@/lib/i18n";
+import { tc } from "@/lib/content-i18n";
 import { formatMoney } from "@/lib/money";
 
 export default async function ServicesPage() {
@@ -43,8 +44,8 @@ export default async function ServicesPage() {
                 <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {Math.round(s.durationMinutes / 60)}h</span>
                 <span className="flex items-center gap-1"><Layers className="h-3.5 w-3.5" /> {s._count.packages} {d.common.packages}</span>
               </div>
-              <h2 className="mt-1.5 text-xl font-bold">{s.name}</h2>
-              <p className="mt-1 line-clamp-2 text-sm text-slate-300">{s.description}</p>
+              <h2 className="mt-1.5 text-xl font-bold">{tc(locale, s.name)}</h2>
+              <p className="mt-1 line-clamp-2 text-sm text-slate-300">{tc(locale, s.description)}</p>
               <div className="mt-4 flex items-center justify-between">
                 <span className="chip bg-white/10 text-sky-300 ring-1 ring-white/25 backdrop-blur">
                   {d.common.from} {formatMoney(s.basePrice, settings.currency)}

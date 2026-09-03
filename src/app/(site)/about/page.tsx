@@ -3,6 +3,7 @@ import { ArrowRight, Award, Camera, Heart } from "lucide-react";
 import { getSettings } from "@/lib/settings";
 import { getLocale } from "@/lib/locale";
 import { getDict, fmt } from "@/lib/i18n";
+import { tc } from "@/lib/content-i18n";
 
 export default async function AboutPage() {
   const [s, locale] = await Promise.all([getSettings(), getLocale()]);
@@ -19,7 +20,7 @@ export default async function AboutPage() {
       <p className="eyebrow">{d.about.eyebrow}</p>
       <h1 className="mt-2 text-4xl font-extrabold tracking-tight md:text-5xl">{fmt(d.about.title, { name: s.businessName })}</h1>
       <p className="mt-6 whitespace-pre-line text-lg leading-relaxed text-slate-600">
-        {s.aboutText || s.description}
+        {tc(locale, s.aboutText) || tc(locale, s.description)}
       </p>
 
       <div className="mt-14 grid gap-6 sm:grid-cols-3">

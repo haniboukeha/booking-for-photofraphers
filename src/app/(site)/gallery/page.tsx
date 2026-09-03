@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getLocale } from "@/lib/locale";
 import { getDict } from "@/lib/i18n";
+import { tc } from "@/lib/content-i18n";
 
 export default async function GalleryPage() {
   const [locale, images] = await Promise.all([
@@ -34,10 +35,10 @@ export default async function GalleryPage() {
             <figcaption className="absolute inset-x-0 bottom-0 translate-y-4 p-5 text-sm font-semibold text-white opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
               {img.service ? (
                 <Link href={`/services/${img.service.slug}`} className="hover:underline">
-                  {img.service.name} →
+                  {tc(locale, img.service.name)} →
                 </Link>
               ) : (
-                img.altText
+                tc(locale, img.altText)
               )}
             </figcaption>
           </figure>
