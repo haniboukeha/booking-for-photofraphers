@@ -4,6 +4,7 @@ import path from "path";
 import { Readable } from "stream";
 import { v2 as cloudinary } from "cloudinary";
 import { requireAdmin } from "@/lib/auth/session";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const EXT_BY_TYPE: Record<string, string> = {
@@ -54,6 +55,9 @@ async function saveLocally(bytes: Buffer, ext: string): Promise<string> {
 }
 
 export async function POST(request: Request) {
+  if (!rateLimit(`upload:${clientIp(request.headers)}`, 30, 10 * 60 * 1000)) {
+    return Response.json({ error: "Too many uploads. Please wait a few minutes." }, { status: 429 });
+  }
   try {
     await requireAdmin();
   } catch {

@@ -1,7 +1,9 @@
 "use server";
 
+import { headers } from "next/headers";
 import { createBooking, BookingRejection } from "@/lib/bookings/create";
 import { bookingSchema } from "@/lib/validation";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 
 export interface BookingFormState {
   ok: boolean;
@@ -10,6 +12,10 @@ export interface BookingFormState {
 }
 
 export async function submitBooking(_prev: BookingFormState, formData: FormData): Promise<BookingFormState> {
+  const h = await headers();
+  if (!rateLimit(`booking:${clientIp(h)}`, 5, 10 * 60 * 1000)) {
+    return { ok: false, error: "Too many attempts. Please wait a few minutes and try again." };
+  }
   const raw = {
     firstName: formData.get("firstName"),
     lastName: formData.get("lastName"),

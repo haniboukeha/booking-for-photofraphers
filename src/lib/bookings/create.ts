@@ -3,6 +3,7 @@ import { getSettings } from "@/lib/settings";
 import { computeAddonLine, computeTotal } from "@/lib/pricing";
 import { countActiveHolds, hasOverlap } from "@/lib/availability";
 import { isValidSlot } from "@/lib/slots";
+import { expireStaleHolds } from "@/lib/bookings/status";
 import { dateStrToUtcDate, isoWeekdayOf, todayInZone, zonedWallTimeToUtc } from "@/lib/timezone";
 import type { BookingInput } from "@/lib/validation";
 
@@ -22,6 +23,9 @@ export function normalizePhone(phone: string): string {
 }
 
 export async function createBooking(input: BookingInput): Promise<{ code: string; id: string }> {
+  // Release any expired holds first so the day-hold unique index cannot
+  // deadlock dates behind abandoned PENDING requests (belt + braces with cron).
+  await expireStaleHolds();
   const settings = await getSettings();
   const today = todayInZone(settings.timezone);
 
