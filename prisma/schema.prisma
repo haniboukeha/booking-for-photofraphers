@@ -1,0 +1,201 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+  CANCELLED
+  COMPLETED
+  EXPIRED
+}
+
+enum BlockedDateType {
+  PERSONAL
+  HOLIDAY
+  MAINTENANCE
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("ADMIN")
+  createdAt    DateTime @default(now())
+}
+
+model Customer {
+  id        String    @id @default(cuid())
+  firstName String
+  lastName  String
+  phone     String    @unique
+  email     String?   @unique
+  notes     String?
+  createdAt DateTime  @default(now())
+  bookings  Booking[]
+}
+
+model Service {
+  id              String           @id @default(cuid())
+  name            String
+  slug            String           @unique
+  description     String
+  basePrice       Int
+  coverImageUrl   String?
+  durationMinutes Int              @default(60)
+  featured        Boolean          @default(false)
+  active          Boolean          @default(true)
+  archivedAt      DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  packages        ServicePackage[]
+  images          GalleryImage[]
+}
+
+model ServicePackage {
+  id         String         @id @default(cuid())
+  serviceId  String
+  service    Service        @relation(fields: [serviceId], references: [id])
+  name       String
+  description String?
+  imageUrl   String?
+  price      Int
+  features   String[]
+  sortOrder  Int            @default(0)
+  active     Boolean        @default(true)
+  archivedAt DateTime?
+  addons     PackageAddon[]
+  items      BookingItem[]
+}
+
+model Addon {
+  id            String         @id @default(cuid())
+  name          String
+  description   String?
+  imageUrl      String?
+  price         Int
+  allowQuantity Boolean        @default(false)
+  minQuantity   Int            @default(1)
+  maxQuantity   Int            @default(1)
+  active        Boolean        @default(true)
+  archivedAt    DateTime?
+  packages      PackageAddon[]
+}
+
+model PackageAddon {
+  packageId String
+  addonId   String
+  package   ServicePackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  addon     Addon          @relation(fields: [addonId], references: [id], onDelete: Cascade)
+
+  @@id([packageId, addonId])
+}
+
+model Booking {
+  id                 String        @id @default(cuid())
+  code               String        @unique
+  customerId         String
+  customer           Customer      @relation(fields: [customerId], references: [id])
+  bookingDate        DateTime      @db.Date
+  startsAt           DateTime      @db.Timestamptz()
+  endsAt             DateTime      @db.Timestamptz()
+  requestedTime      String?
+  status             BookingStatus @default(PENDING)
+  subtotal           Int
+  total              Int
+  currency           String        @default("DZD")
+  notes              String?
+  eventAddress       String?
+  rejectionReason    String?
+  cancellationReason String?
+  holdExpiresAt      DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  items              BookingItem[]
+
+  @@index([bookingDate, status])
+  @@index([createdAt])
+}
+
+model BookingItem {
+  id           String             @id @default(cuid())
+  bookingId    String
+  booking      Booking            @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  serviceId    String?
+  serviceName  String
+  packageId    String?
+  package      ServicePackage?    @relation(fields: [packageId], references: [id])
+  packageName  String
+  packagePrice Int
+  quantity     Int                @default(1)
+  lineTotal    Int
+  addons       BookingItemAddon[]
+}
+
+model BookingItemAddon {
+  id            String      @id @default(cuid())
+  bookingItemId String
+  bookingItem   BookingItem @relation(fields: [bookingItemId], references: [id], onDelete: Cascade)
+  addonId       String?
+  addonName     String
+  addonPrice    Int
+  quantity      Int
+  lineTotal     Int
+}
+
+model BlockedDate {
+  id     String          @id @default(cuid())
+  date   DateTime        @db.Date @unique
+  reason String
+  type   BlockedDateType @default(PERSONAL)
+}
+
+model GalleryImage {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  publicId  String?
+  altText   String?
+  serviceId String?
+  service   Service? @relation(fields: [serviceId], references: [id])
+  sortOrder Int      @default(0)
+  active    Boolean  @default(true)
+}
+
+model BusinessSettings {
+  id                Int      @id @default(1)
+  businessName      String   @default("Studio Booking")
+  headline          String   @default("")
+  description       String   @default("")
+  aboutText         String   @default("")
+  phone             String   @default("")
+  email             String   @default("")
+  whatsapp          String   @default("")
+  instagram         String   @default("")
+  location          String   @default("")
+  businessHours     String   @default("")
+  openTime          String   @default("09:00")
+  closeTime         String   @default("18:00")
+  timezone          String   @default("Africa/Algiers")
+  workingDays       Int[]    @default([1, 2, 3, 4, 5, 6])
+  currency          String   @default("DZD")
+  holdPending       Boolean  @default(true)
+  holdHours         Int      @default(24)
+  maxBookingsPerDay Int      @default(1)
+  updatedAt         DateTime @updatedAt
+}
+
+model NotificationOutbox {
+  id        String    @id @default(cuid())
+  bookingId String?
+  type      String
+  payload   Json
+  sentAt    DateTime?
+  createdAt DateTime  @default(now())
+}
